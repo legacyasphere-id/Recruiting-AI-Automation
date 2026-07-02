@@ -1,0 +1,51 @@
+# Decision Log
+
+Lightweight architecture decision records. Newest at the bottom. Format: context → decision → consequences. Log anything a future maintainer would ask "why?" about.
+
+---
+
+## D-001 — Orchestration: n8n + custom TypeScript code (hybrid)
+
+**Date:** 2026-07-02 · **Status:** Accepted
+
+**Context:** The system is integration-heavy (Gmail, Slack, Calendly, cron) but has an AI core (prompts, schema validation, business rules) that must be testable and reviewable. Options considered: pure n8n, pure custom code, hybrid.
+
+**Decision:** n8n handles triggers and third-party integrations; a thin TypeScript layer handles Claude calls, JSON validation, and business logic. n8n workflows are exported to `workflows/` for version control.
+
+**Consequences:** Two runtimes to operate, but each does what it's best at. AI logic gets unit tests and types; integration plumbing stays visual and fast to change. Workflow exports become a portfolio artifact (Phase IX/X).
+
+---
+
+## D-002 — CRM / data layer: Supabase (Postgres)
+
+**Date:** 2026-07-02 · **Status:** Accepted
+
+**Context:** The Memory phase needs relational integrity (contacts ↔ conversations ↔ activities), an audit trail, and easy API access from both n8n and code. Options: Supabase, Airtable, Notion, self-hosted MySQL/Postgres.
+
+**Decision:** Supabase — real Postgres with foreign keys and reversible migrations, auto-generated REST API, row-level security for any future client-facing surface.
+
+**Consequences:** Automation-grade querying and integrity; slightly less "browseable" for non-technical users than Airtable (mitigable later with a simple view or the Supabase dashboard).
+
+---
+
+## D-003 — Nature: portfolio build with real integrations
+
+**Date:** 2026-07-02 · **Status:** Accepted
+
+**Context:** The system reconstructs a real client engagement. It could be a mock-driven demo or a live system.
+
+**Decision:** Build to production quality against real accounts (own Gmail/Slack/Calendly), showcased as portfolio proof in Phase X.
+
+**Consequences:** Real OAuth, real error paths, and real operational concerns from day one — slower than mocks but the result is credible. Security and approval flows are treated as production requirements, not demo props.
+
+---
+
+## D-004 — Delivery: strict phase gating
+
+**Date:** 2026-07-02 · **Status:** Accepted
+
+**Context:** The Engineering Handbook defines 10 phases, each ending with "approved before advancing." The Sphere Method's biggest failure mode is building ahead of validation.
+
+**Decision:** No phase begins until the previous phase's exit criteria are met and the owner explicitly approves. Current phase is tracked in `CONTEXT.md`.
+
+**Consequences:** Slower start, fewer rewrites. Every phase leaves documentation and a reviewable artifact behind.
