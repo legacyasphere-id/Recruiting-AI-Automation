@@ -61,3 +61,15 @@ Lightweight architecture decision records. Newest at the bottom. Format: context
 **Decision:** Embed the method as first-class files: `CLAUDE.md` (auto-loaded session bootstrap with session rules, phase commands, and the Handbook↔Sphere phase mapping) and `docs/PRODUCT-REVIEW-CHECKLIST.md` (the v2.1 review gate adapted to this system).
 
 **Consequences:** Every AI session in this repo self-configures to the methodology without a manual `/sphere-init`. Phase gates and the review checklist become enforceable references, not tribal knowledge.
+
+---
+
+## D-006 — Messenger classifier as a standalone HTTP service
+
+**Date:** 2026-07-03 · **Status:** Accepted
+
+**Context:** Phase II needs the AI classification logic to be testable and typed (D-001 hybrid split). n8n must call it per email. Options: n8n Code node with inline logic, Supabase Edge Function, standalone HTTP service.
+
+**Decision:** A small Fastify service (`services/messenger`) exposing `POST /classify`. Claude is called with the API's structured-outputs feature (`messages.parse` + Zod v4 schema), model `claude-opus-4-8` with adaptive thinking, no sampling params. Email content is treated as untrusted data (prompt-injection defense in the system prompt). Failures return HTTP 502 so n8n routes them to the dead-letter output.
+
+**Consequences:** The AI boundary has unit tests (mocked client), strict validation, and versioned prompts. One extra process to host next to n8n (deploy target decided before Phase V/VI). Note: the SDK's `zodOutputFormat` helper requires Zod v4 — Zod v3 schemas fail at runtime.
