@@ -37,8 +37,8 @@ The build follows a 10-phase plan; each phase is documented, implemented, tested
 
 | # | Phase | Focus | Status |
 |---|---|---|---|
-| I | The Foundation | Repo, architecture, conventions, secrets strategy | ✅ In review |
-| II | The Messenger | Gmail trigger, parsing, AI classification | ⬜ Planned |
+| I | The Foundation | Repo, architecture, conventions, secrets strategy | ✅ Complete |
+| II | The Messenger | Gmail trigger, parsing, AI classification | 🟡 In review |
 | III | The Oracle | Prompt engineering, JSON schemas, draft replies | ⬜ Planned |
 | IV | The Memory | CRM schema, contacts, activities, audit trail | ⬜ Planned |
 | V | The Watcher | Follow-up detection, Slack digest, business-day logic | ⬜ Planned |

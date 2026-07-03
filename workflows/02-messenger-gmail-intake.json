@@ -1,0 +1,182 @@
+{
+  "name": "02 Messenger — Gmail Intake & Classification",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "labelIds": ["INBOX"]
+        },
+        "options": {
+          "downloadAttachments": false
+        }
+      },
+      "id": "gmail-trigger",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0],
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const m = $input.item.json;\nconst headers = m.payload?.headers ?? [];\nconst header = (name) => headers.find((h) => h.name.toLowerCase() === name.toLowerCase())?.value ?? '';\n\nreturn {\n  json: {\n    message_id: m.id,\n    thread_id: m.threadId,\n    from: header('From'),\n    to: header('To'),\n    subject: header('Subject'),\n    body: m.text ?? m.snippet ?? '',\n    received_at: header('Date'),\n  },\n};"
+      },
+      "id": "prepare-payload",
+      "name": "Prepare Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CLASSIFIER_URL }}/classify",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "timeout": 120000,
+          "response": {
+            "response": {
+              "fullResponse": false
+            }
+          }
+        }
+      },
+      "id": "classify-email",
+      "name": "Classify Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 0],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.classification.requires_reply }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "requires-reply",
+      "name": "Requires Reply?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [660, 0]
+    },
+    {
+      "parameters": {},
+      "id": "to-draft-pipeline",
+      "name": "To Draft Pipeline (Phase III)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [880, -100]
+    },
+    {
+      "parameters": {},
+      "id": "to-crm",
+      "name": "To CRM (Phase IV)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [880, 100]
+    },
+    {
+      "parameters": {},
+      "id": "dead-letter",
+      "name": "Dead Letter (Phase VIII: alert)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [660, 220]
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Prepare Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Payload": {
+      "main": [
+        [
+          {
+            "node": "Classify Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Email": {
+      "main": [
+        [
+          {
+            "node": "Requires Reply?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Dead Letter (Phase VIII: alert)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Requires Reply?": {
+      "main": [
+        [
+          {
+            "node": "To Draft Pipeline (Phase III)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "To CRM (Phase IV)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Jakarta"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}
