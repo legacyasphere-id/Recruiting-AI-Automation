@@ -44,4 +44,4 @@ npm run dev       # tsx watch, needs ANTHROPIC_API_KEY
 npm run build && npm start
 ```
 
-Env: `ANTHROPIC_API_KEY` (required at runtime), `CLAUDE_MODEL` (default `claude-opus-4-8`), `CLASSIFIER_PORT` (default 8787), `CLASSIFIER_HOST`.
+Env: `ANTHROPIC_API_KEY` (required at runtime), `CLAUDE_MODEL` (default `claude-haiku-4-5` — a bounded extraction task doesn't need Opus-tier reasoning; override for a harder workload), `CLASSIFIER_PORT` (default 8787), `CLASSIFIER_HOST`.

@@ -7,7 +7,18 @@ import {
 } from "./schema.js";
 import { cleanEmailBody, truncateBody } from "./email-parser.js";
 
-export const DEFAULT_MODEL = process.env.CLAUDE_MODEL ?? "claude-opus-4-8";
+// Classification is a bounded, well-structured extraction task — Haiku 4.5
+// matches larger models on this and is far cheaper/faster at inbox volume.
+// Reserve Opus/Sonnet-tier reasoning for Phase III's generative draft work.
+export const DEFAULT_MODEL = process.env.CLAUDE_MODEL ?? "claude-haiku-4-5";
+
+// Haiku 4.5 does not support adaptive thinking / effort (both are documented
+// as Opus 4.6+ / Sonnet 4.6+ / Fable 5 features and error on Haiku). Only
+// request it for models known to support it, so CLAUDE_MODEL can still be
+// pointed at a larger model without a 400.
+function supportsAdaptiveThinking(model: string): boolean {
+  return !model.includes("haiku");
+}
 
 // Versioned prompt (see CONVENTIONS.md — every Claude call has a versioned
 // prompt, a schema, validation, and a bounded retry).
@@ -77,7 +88,7 @@ export async function classifyEmail(
     response = await client.messages.parse({
       model,
       max_tokens: 4096,
-      thinking: { type: "adaptive" },
+      ...(supportsAdaptiveThinking(model) ? { thinking: { type: "adaptive" as const } } : {}),
       system: [
         {
           type: "text",

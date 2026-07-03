@@ -45,9 +45,10 @@ Full log with rationale: [docs/DECISIONS.md](docs/DECISIONS.md)
 ## Current focus
 
 - [x] Phase I complete and merged to main (PR #1)
-- [x] Phase II built: messenger service (parse + classify, 22 tests passing) and n8n intake workflow
-- [ ] Owner reviews the Phase II PR
-- [ ] Live end-to-end test: import workflow into n8n, connect Gmail OAuth, run one real email through `/classify`
+- [x] Phase II built: messenger service (parse + classify, 24 tests passing) and n8n intake workflow
+- [x] Model swapped from Opus to Haiku 4.5 for classification (D-006 updated) — bounded extraction task, Opus reserved for Phase III generation
+- [ ] **Owner action required:** run `docs/phases/PHASE-II-E2E-RUNBOOK.md` — golden path, dead-letter path, and a Haiku accuracy spot-check against real emails. This cannot run inside the build container (no API key, no n8n, no Gmail OAuth flow available there).
+- [ ] On confirmation: merge PR #2
 - [ ] Next: Phase III – The Oracle (draft replies, richer prompts/summaries)
 
 ## Open questions
@@ -63,3 +64,4 @@ Full log with rationale: [docs/DECISIONS.md](docs/DECISIONS.md)
 | 2026-07-02 | Project initiated. Source docs ingested (Handbook Masterplan, Sphere Method v2.1). Stack decisions D-001…D-004 made. Phase I foundation built: repo structure, architecture docs, conventions, secrets strategy, README. |
 | 2026-07-03 | PR #1 review feedback ("lean to the method"): Sphere Method embedded as repo artifacts — CLAUDE.md session bootstrap (session rules, phase commands, methodology mapping) and docs/PRODUCT-REVIEW-CHECKLIST.md (D-005). |
 | 2026-07-03 | Phase I approved; PR #1 merged to main. Phase II built: `services/messenger` (Fastify + Claude structured outputs classifier, Zod v4, 22 unit tests), `workflows/02-messenger-gmail-intake.json`, phase doc. Decision D-006 logged. |
+| 2026-07-03 | Owner flagged Opus as overkill for classification — swapped default model to `claude-haiku-4-5` (adaptive thinking now conditional on model support), D-006 updated, 2 tests added (24 total). Live e2e test (Gmail OAuth + n8n) requires owner's own environment — wrote `docs/phases/PHASE-II-E2E-RUNBOOK.md` since this build container has no API key, no n8n, and can't complete an OAuth flow. |

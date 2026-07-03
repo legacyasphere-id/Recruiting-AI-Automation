@@ -30,14 +30,14 @@ describe("classifyEmail", () => {
     const client = fakeClient({
       parsed_output: sampleClassification,
       stop_reason: "end_turn",
-      model: "claude-opus-4-8",
+      model: "claude-haiku-4-5",
       usage: { input_tokens: 900, output_tokens: 120 },
     });
 
     const result = await classifyEmail(sampleRequest, client);
 
     expect(result.classification).toEqual(sampleClassification);
-    expect(result.model).toBe("claude-opus-4-8");
+    expect(result.model).toBe("claude-haiku-4-5");
     expect(result.prompt_version).toBe("v1");
     expect(result.usage).toEqual({ input_tokens: 900, output_tokens: 120 });
   });
@@ -46,7 +46,7 @@ describe("classifyEmail", () => {
     const client = fakeClient({
       parsed_output: sampleClassification,
       stop_reason: "end_turn",
-      model: "claude-opus-4-8",
+      model: "claude-haiku-4-5",
       usage: { input_tokens: 1, output_tokens: 1 },
     });
 
@@ -57,8 +57,37 @@ describe("classifyEmail", () => {
     expect(userContent).toContain("<email>");
     expect(userContent).toContain("From: Sarah Lee <sarah@acme.com>");
     expect(userContent).not.toContain("-- \nSarah"); // signature stripped
-    expect(call.thinking).toEqual({ type: "adaptive" });
     expect(call.output_config?.format).toBeDefined();
+  });
+
+  it("omits adaptive thinking on the default Haiku model (unsupported there)", async () => {
+    const client = fakeClient({
+      parsed_output: sampleClassification,
+      stop_reason: "end_turn",
+      model: "claude-haiku-4-5",
+      usage: { input_tokens: 1, output_tokens: 1 },
+    });
+
+    await classifyEmail(sampleRequest, client);
+
+    const call = (client.messages.parse as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    expect(call.thinking).toBeUndefined();
+    expect(call.model).toBe("claude-haiku-4-5");
+  });
+
+  it("requests adaptive thinking when pointed at a larger model", async () => {
+    const client = fakeClient({
+      parsed_output: sampleClassification,
+      stop_reason: "end_turn",
+      model: "claude-opus-4-8",
+      usage: { input_tokens: 1, output_tokens: 1 },
+    });
+
+    await classifyEmail(sampleRequest, client, "claude-opus-4-8");
+
+    const call = (client.messages.parse as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    expect(call.thinking).toEqual({ type: "adaptive" });
+    expect(call.model).toBe("claude-opus-4-8");
   });
 
   it("throws ClassificationError on model refusal", async () => {

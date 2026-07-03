@@ -49,7 +49,9 @@ Every email is classified into exactly this shape (Zod-enforced, produced via th
 
 ### Model choice
 
-`claude-opus-4-8` with adaptive thinking (configurable via `CLAUDE_MODEL`). Classification output is small; `max_tokens` 4096. Token usage is logged per call for cost observability.
+`claude-haiku-4-5` (configurable via `CLAUDE_MODEL`). Classification is a bounded, well-structured extraction task — model, urgency, contact fields, a short summary from a schema the model must fill in — which Haiku-tier models handle as reliably as larger ones, at a fraction of the cost and latency. That matters once this is running against real inbox volume. Opus/Fable-tier reasoning is reserved for Phase III, where the model actually composes draft reply content and the extra reasoning earns its cost.
+
+Adaptive thinking (`thinking: {type: "adaptive"}`) is only requested for models that support it (Opus 4.6+/Sonnet 4.6+/Fable 5) — Haiku 4.5 doesn't support it, so the classifier omits the parameter entirely when `CLAUDE_MODEL` resolves to a Haiku model. `max_tokens` is 4096 (classification output is small). Token usage is logged per call for cost observability. See decision D-006.
 
 ### Idempotency note
 
