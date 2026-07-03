@@ -39,6 +39,7 @@ Full log with rationale: [docs/DECISIONS.md](docs/DECISIONS.md)
 2. **D-002** — CRM/data layer: Supabase (Postgres)
 3. **D-003** — Nature: portfolio build with real integrations, production quality
 4. **D-004** — Delivery: strict phase gating; each phase approved before the next begins
+5. **D-005** — Sphere Method embedded as repo artifacts (CLAUDE.md bootstrap + review checklist)
 
 ## Current focus
 
@@ -57,3 +58,4 @@ Full log with rationale: [docs/DECISIONS.md](docs/DECISIONS.md)
 | Date | Summary |
 |---|---|
 | 2026-07-02 | Project initiated. Source docs ingested (Handbook Masterplan, Sphere Method v2.1). Stack decisions D-001…D-004 made. Phase I foundation built: repo structure, architecture docs, conventions, secrets strategy, README. |
+| 2026-07-03 | PR #1 review feedback ("lean to the method"): Sphere Method embedded as repo artifacts — CLAUDE.md session bootstrap (session rules, phase commands, methodology mapping) and docs/PRODUCT-REVIEW-CHECKLIST.md (D-005). |

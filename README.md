@@ -52,8 +52,9 @@ The build follows a 10-phase plan; each phase is documented, implemented, tested
 
 | Path | Purpose |
 |---|---|
+| [`CLAUDE.md`](CLAUDE.md) | Sphere Method session bootstrap — rules every AI session follows here |
 | [`CONTEXT.md`](CONTEXT.md) | Project memory — current phase, decisions, next actions |
-| [`docs/`](docs/) | Architecture, conventions, secrets strategy, decision log |
+| [`docs/`](docs/) | Architecture, conventions, secrets strategy, decision log, review checklist |
 | [`workflows/`](workflows/) | n8n workflow JSON exports (Phase II+) |
 | [`services/`](services/) | TypeScript services — classification, schemas (Phase III+) |
 | [`supabase/`](supabase/) | Database migrations and schema (Phase IV) |

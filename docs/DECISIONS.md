@@ -49,3 +49,15 @@ Lightweight architecture decision records. Newest at the bottom. Format: context
 **Decision:** No phase begins until the previous phase's exit criteria are met and the owner explicitly approves. Current phase is tracked in `CONTEXT.md`.
 
 **Consequences:** Slower start, fewer rewrites. Every phase leaves documentation and a reviewable artifact behind.
+
+---
+
+## D-005 — Sphere Method embedded as repo artifacts
+
+**Date:** 2026-07-03 · **Status:** Accepted
+
+**Context:** PR #1 review feedback from the owner: "still lean to the method." The Sphere Method existed only implicitly in the docs; sessions could drift from it.
+
+**Decision:** Embed the method as first-class files: `CLAUDE.md` (auto-loaded session bootstrap with session rules, phase commands, and the Handbook↔Sphere phase mapping) and `docs/PRODUCT-REVIEW-CHECKLIST.md` (the v2.1 review gate adapted to this system).
+
+**Consequences:** Every AI session in this repo self-configures to the methodology without a manual `/sphere-init`. Phase gates and the review checklist become enforceable references, not tribal knowledge.
